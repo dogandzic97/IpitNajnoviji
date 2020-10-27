@@ -1,0 +1,295 @@
+  <DataGrid x:Name="grid" AutoGenerateColumns="False" HorizontalAlignment="Left" Height="155" Margin="10,51,0,0" VerticalAlignment="Top" Width="270">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Sifra pacijenta" Binding="{Binding IDPacijet}"/>
+                <DataGridTextColumn Header="Ime pacijenta" Binding="{Binding Ime}"/>
+                <DataGridTextColumn Header="Prezime pacijenta" Binding="{Binding Prezime}"/>
+            </DataGrid.Columns>
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height='20'/>
+                            <RowDefinition Height='20'/>
+                            <RowDefinition Height='20'/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Odeljenje" Grid.Row="0" Grid.Column="0" />
+                        <TextBox Text="{Binding OdeljenjeID}" Grid.Row="0" Grid.Column="1" />
+                        <TextBlock Text="Soba" Grid.Row="1" Grid.Column="0" />
+                        <TextBox Text="{Binding SobaID}" Grid.Row="1" Grid.Column="1" />
+                        <TextBlock Text="Br Dana" Grid.Row="2" Grid.Column="0" />
+                        <TextBox Text="{Binding BrDana}" Grid.Row="2" Grid.Column="1" />
+
+                    </Grid>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+        </DataGrid>
+        <Menu HorizontalAlignment="Left" Height="23" VerticalAlignment="Top" Width="125" Margin="10,10,0,0">
+            <MenuItem Header="Meni">
+                <MenuItem Header="Unesi novog" Click="MenuItem_Click">
+
+
+                </MenuItem>
+
+            </MenuItem>
+        </Menu>
+
+
+
+
+    DataClasses1DataContext dc = new DataClasses1DataContext();
+        private void puniGrid()
+        {
+            var c = from p in dc.Pacijents select p;
+            grid.ItemsSource = c;
+        }
+
+      
+
+
+        //Brisi 
+        private void BtnRaskid_Click(object sender, RoutedEventArgs e)
+        {
+            Pacijent pacijent = (from p in dc.Pacijents
+                                 where p.IDPacijet == int.Parse(tb1.Text)
+                                 select p).FirstOrDefault();
+
+            dc.Pacijents.DeleteOnSubmit(pacijent);
+
+            try
+            {
+                dc.SubmitChanges();
+                MessageBox.Show("Uspesno je raskinut ugovor sa " + pacijent.Prezime + pacijent.Ime + "-om", "Potvrda", MessageBoxButton.OK);
+                puniGrid();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Greska pri raskidu ugovora" + ex);
+            }
+        }
+
+
+        //Lista
+
+
+        //Pretraga
+        void puniKombo()
+        {
+            var data = from o in dc.Odeljenjes
+                       select o.Naziv;
+            cmbPretraga.ItemsSource = data;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string naziv1 = cmbPretraga.SelectedValue.ToString();
+            var upit = from p in dc.Pacijents
+                       join c in dc.Odeljenjes
+                       on p.OdeljenjeID equals c.OdeljenjeID
+                       where c.Naziv == naziv1
+                       select p.Ime +" " +p.Prezime;
+            lista.ItemsSource = upit;
+        }
+
+        private void cmbPretraga_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+        //RadioButton
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            string b = "Luka";
+            var c = from k in dc.Pacijents select (k.Ime).ToString(); 
+            if (b == c.ToString())
+                lista.ItemsSource = b;
+            else
+            {
+                MessageBox.Show("Nema podudaranja");
+            }
+
+        }
+
+        private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
+        {
+            string b = "Andja";
+            var c = from k in dc.Pacijents select (k.Ime).ToString();
+            if (b == c.ToString())
+                lista.ItemsSource = b;
+            else
+            {
+                MessageBox.Show("Nema podudaranja");
+            }
+        }
+
+        private void RadioButton_Checked_2(object sender, RoutedEventArgs e)
+        {
+            string b = "Filip";
+            var c = from k in dc.Pacijents select (k.Ime).ToString();
+            if (b == c.ToString())
+                lista.ItemsSource = b;
+            else
+            {
+                MessageBox.Show("Nema podudaranja");
+            }
+        }
+
+        //UnosNovog
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            UnosNovog nov = new UnosNovog();
+            nov.ShowDialog();
+            puniGrid();
+        }
+       
+    }
+}
+
+
+
+
+
+
+
+     <DataTemplate x:Key="PrikazKurseva">
+            <StackPanel Orientation="Horizontal" Margin="6">
+                <TextBlock Text="{Binding Naziv}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="PrikazPaketa">
+            <StackPanel Orientation="Horizontal" Margin="6">
+                <TextBlock Text="{Binding PaketID}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Margin="0,0,54,0">
+        <TextBlock HorizontalAlignment="Left" Margin="52,55,0,0" TextWrapping="Wrap" Text="Sifra" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbSifraPolaznika" HorizontalAlignment="Left" Height="23" Margin="154,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="52,110,0,0" TextWrapping="Wrap" Text="Ime" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbIme" HorizontalAlignment="Left" Height="23" Margin="154,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="52,158,0,0" TextWrapping="Wrap" Text="Prezime" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbPrezime" HorizontalAlignment="Left" Height="23" Margin="154,151,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="52,210,0,0" TextWrapping="Wrap" Text="Kurs" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbKursevi" ItemTemplate="{StaticResource PrikazKurseva}" HorizontalAlignment="Left" Margin="154,204,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="CmbKursevi_SelectionChanged"/>
+        <TextBlock HorizontalAlignment="Left" Margin="52,267,0,0" TextWrapping="Wrap" Text="Paket" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbPaketi" ItemTemplate="{StaticResource PrikazPaketa}" HorizontalAlignment="Left" Margin="154,261,0,0" VerticalAlignment="Top" Width="70" SelectionChanged="CmbPaketi_SelectionChanged"/>
+        <TextBlock HorizontalAlignment="Left" Margin="322,214,0,0" TextWrapping="Wrap" Text="Cena" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbCena" HorizontalAlignment="Left" Height="23" Margin="390,207,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70"/>
+        <TextBlock HorizontalAlignment="Left" Margin="322,248,0,0" TextWrapping="Wrap" Text="Trajanje" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbTrajanje" HorizontalAlignment="Left" Height="23" Margin="390,241,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70"/>
+        <TextBlock HorizontalAlignment="Left" Margin="322,283,0,0" TextWrapping="Wrap" Text="Popust" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbPopust" HorizontalAlignment="Left" Height="23" Margin="390,276,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="70"/>
+        <Button x:Name="btnUnesi" Content="Unesi" HorizontalAlignment="Left" Margin="131,358,0,0" VerticalAlignment="Top" Width="75" Click="BtnUnesi_Click"/>
+        <Button x:Name="btnOdustani" Content="Odustani" HorizontalAlignment="Left" Margin="293,358,0,0" VerticalAlignment="Top" Width="75" Click="BtnOdustani_Click"/>
+
+    </Grid>
+
+
+
+
+
+
+     public UnosNovog()
+        {
+            InitializeComponent();
+        }
+        BazaDataContext db = new BazaDataContext();
+        public UnosNovog()
+        {
+            InitializeComponent();
+            puniKurseve();
+        }
+
+        void puniKurseve()
+        {
+            var kursevi = from k in db.Kurs
+                          select k;
+
+            cmbKursevi.ItemsSource = kursevi;
+        }
+
+        void puniCenu()
+        {
+            var cena = (from c in db.Kurs
+                        where c.KursID == ((Kur)cmbKursevi.SelectedValue).KursID
+                        select c.Cena).FirstOrDefault();
+
+            tbCena.Text = cena.ToString();
+        }
+
+        void puniTrajanje()
+        {
+            var trajanje = (from t in db.Kurs
+                            where t.KursID == ((Kur)cmbKursevi.SelectedValue).KursID
+                            select t.Trajanje).FirstOrDefault();
+
+            tbTrajanje.Text = trajanje.ToString();
+        }
+
+        private void CmbKursevi_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            puniCenu();
+            puniTrajanje();
+            puniPakete();
+        }
+
+        void puniPakete()
+        {
+            var paketi = from p in db.Pakets
+                         where p.KursID == ((Kur)cmbKursevi.SelectedValue).KursID
+                         select p;
+
+            cmbPaketi.ItemsSource = paketi;
+        }
+
+        void puniPopuste()
+        {
+            var popusti = (from p in db.Pakets
+                           where p.PaketID == ((Paket)cmbPaketi.SelectedValue).PaketID
+                           select p.Popust).FirstOrDefault();
+
+            tbPopust.Text = popusti.ToString();
+        }
+
+        private void CmbPaketi_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            puniPopuste();
+        }
+
+        private void BtnUnesi_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(tbSifraPolaznika.Text) || String.IsNullOrEmpty(tbIme.Text) || String.IsNullOrEmpty(tbPrezime.Text) || cmbKursevi.SelectedValue == null || cmbPaketi.SelectedValue == null)
+            {
+                MessageBox.Show("Sva polja moraju biti popunjena!", "Greska", MessageBoxButton.OK);
+            }
+            else
+            {
+                Polaznik polaznik = new Polaznik();
+
+                polaznik.PolaznikID = int.Parse(tbSifraPolaznika.Text);
+                polaznik.Ime = tbIme.Text;
+                polaznik.Prezime = tbPrezime.Text;
+                polaznik.KursID = ((Kur)cmbKursevi.SelectedValue).KursID;
+                polaznik.PaketID = ((Paket)cmbPaketi.SelectedValue).PaketID;
+
+                db.Polazniks.InsertOnSubmit(polaznik);
+
+                try
+                {
+                    db.SubmitChanges();
+                    MessageBox.Show("Uspesno ste dodali novog polaznika", "Potvrda", MessageBoxButton.OK);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Greska pri dodavanju polaznika" + ex);
+                }
+            }
+        }
+
+        private void BtnOdustani_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+    }
